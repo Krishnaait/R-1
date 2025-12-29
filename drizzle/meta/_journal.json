@@ -1,5 +1,20 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1767047000349,
+      "tag": "0000_flashy_rumiko_fujikawa",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1767048744444,
+      "tag": "0001_high_puff_adder",
+      "breakpoints": true
+    }
+  ]
 }

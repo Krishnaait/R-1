@@ -1,6 +1,17 @@
-import { eq } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { 
+  InsertUser, 
+  users, 
+  userTeams, 
+  teamPlayers, 
+  contests, 
+  contestEntries,
+  InsertUserTeam,
+  InsertTeamPlayer,
+  InsertContest,
+  InsertContestEntry
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -17,6 +28,8 @@ export async function getDb() {
   }
   return _db;
 }
+
+// ==================== USER QUERIES ====================
 
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.openId) {
@@ -89,4 +102,207 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function getUserById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// ==================== TEAM QUERIES ====================
+
+export async function createTeam(team: InsertUserTeam) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(userTeams).values(team);
+  return result[0].insertId;
+}
+
+export async function addTeamPlayers(players: InsertTeamPlayer[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(teamPlayers).values(players);
+}
+
+export async function getTeamsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(userTeams).where(eq(userTeams.userId, userId)).orderBy(desc(userTeams.createdAt));
+}
+
+export async function getTeamsByUserAndMatch(userId: number, matchId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(userTeams).where(
+    and(eq(userTeams.userId, userId), eq(userTeams.matchId, matchId))
+  );
+}
+
+export async function getTeamById(teamId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(userTeams).where(eq(userTeams.id, teamId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getTeamPlayers(teamId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(teamPlayers).where(eq(teamPlayers.teamId, teamId));
+}
+
+// ==================== CONTEST QUERIES ====================
+
+export async function createContest(contest: InsertContest) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(contests).values(contest);
+  return result[0].insertId;
+}
+
+export async function getContestsByMatchId(matchId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(contests).where(eq(contests.matchId, matchId));
+}
+
+export async function getContestById(contestId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(contests).where(eq(contests.id, contestId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAllContests() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(contests).orderBy(desc(contests.createdAt));
+}
+
+export async function updateContestEntries(contestId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(contests)
+    .set({ currentEntries: sql`${contests.currentEntries} + 1` })
+    .where(eq(contests.id, contestId));
+}
+
+export async function updateContestStatus(contestId: number, status: "upcoming" | "live" | "completed") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(contests).set({ status }).where(eq(contests.id, contestId));
+}
+
+export async function updateContestStatusByMatchIds(matchIds: string[], status: "upcoming" | "live" | "completed") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  if (matchIds.length === 0) return;
+
+  // Update contests where matchId is in the list
+  for (const matchId of matchIds) {
+    await db.update(contests).set({ status }).where(eq(contests.matchId, matchId));
+  }
+}
+
+export async function getContestMatchIds() {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db.select({ matchId: contests.matchId }).from(contests);
+  return result.map(r => r.matchId);
+}
+
+// ==================== CONTEST ENTRY QUERIES ====================
+
+export async function createContestEntry(entry: InsertContestEntry) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(contestEntries).values(entry);
+  return result[0].insertId;
+}
+
+export async function getContestEntriesByContest(contestId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(contestEntries)
+    .where(eq(contestEntries.contestId, contestId))
+    .orderBy(desc(contestEntries.points));
+}
+
+export async function getContestEntriesByUser(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(contestEntries).where(eq(contestEntries.userId, userId));
+}
+
+export async function checkUserContestEntry(userId: number, contestId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(contestEntries)
+    .where(and(eq(contestEntries.userId, userId), eq(contestEntries.contestId, contestId)))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateEntryPoints(entryId: number, points: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(contestEntries).set({ points }).where(eq(contestEntries.id, entryId));
+}
+
+export async function updateEntryRank(entryId: number, rankPosition: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(contestEntries).set({ rankPosition }).where(eq(contestEntries.id, entryId));
+}
+
+// ==================== LEADERBOARD QUERIES ====================
+
+export async function getLeaderboard(contestId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const entries = await db.select({
+    entryId: contestEntries.id,
+    points: contestEntries.points,
+    rankPosition: contestEntries.rankPosition,
+    teamId: contestEntries.teamId,
+    userId: contestEntries.userId,
+  }).from(contestEntries)
+    .where(eq(contestEntries.contestId, contestId))
+    .orderBy(desc(contestEntries.points));
+
+  // Enrich with user and team data
+  const enrichedEntries = await Promise.all(entries.map(async (entry) => {
+    const user = await getUserById(entry.userId);
+    const team = await getTeamById(entry.teamId);
+    return {
+      ...entry,
+      userName: user?.name || "Unknown",
+      teamName: team?.name || "Unknown Team",
+    };
+  }));
+
+  return enrichedEntries;
+}
