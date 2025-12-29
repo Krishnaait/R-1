@@ -10,13 +10,16 @@ interface MatchCardProps {
   showActions?: boolean;
 }
 
+// IST offset in milliseconds (5 hours 30 minutes)
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
 export default function MatchCard({ match, showActions = true }: MatchCardProps) {
   const getStatusBadge = () => {
     const status = match.ms || (match.matchEnded ? "result" : match.matchStarted ? "live" : "fixture");
     
     switch (status) {
       case "live":
-        return <Badge className="badge-live">LIVE</Badge>;
+        return <Badge className="badge-live animate-pulse">LIVE</Badge>;
       case "fixture":
         return <Badge className="badge-upcoming">Upcoming</Badge>;
       case "result":
@@ -26,30 +29,44 @@ export default function MatchCard({ match, showActions = true }: MatchCardProps)
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
+  // Convert GMT to IST and format date
+  const formatDateIST = (dateStr: string) => {
+    try {
+      const gmtDate = new Date(dateStr);
+      const istDate = new Date(gmtDate.getTime() + IST_OFFSET_MS);
+      return istDate.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    } catch {
+      return dateStr;
+    }
   };
 
-  const formatTime = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleTimeString("en-IN", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  // Convert GMT to IST and format time
+  const formatTimeIST = (dateStr: string) => {
+    try {
+      const gmtDate = new Date(dateStr);
+      const istDate = new Date(gmtDate.getTime() + IST_OFFSET_MS);
+      return istDate.toLocaleTimeString("en-IN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      }) + " IST";
+    } catch {
+      return dateStr;
+    }
   };
 
   const isUpcoming = match.ms === "fixture" || (!match.matchStarted && !match.matchEnded);
+  const isLive = match.ms === "live" || (match.matchStarted && !match.matchEnded);
 
   return (
-    <Card className="card-hover bg-card border-border overflow-hidden">
+    <Card className={`card-hover bg-card border-border overflow-hidden ${isLive ? 'ring-2 ring-destructive/50' : ''}`}>
       <CardContent className="p-0">
         {/* Match Header */}
-        <div className="bg-gradient-to-r from-primary/10 to-accent/10 px-4 py-2 flex items-center justify-between">
+        <div className={`px-4 py-2 flex items-center justify-between ${isLive ? 'bg-gradient-to-r from-destructive/20 to-destructive/10' : 'bg-gradient-to-r from-primary/10 to-accent/10'}`}>
           <span className="text-xs text-muted-foreground truncate max-w-[60%]">
             {match.series || match.name}
           </span>
@@ -86,6 +103,9 @@ export default function MatchCard({ match, showActions = true }: MatchCardProps)
             {/* VS */}
             <div className="flex flex-col items-center">
               <span className="text-xs text-muted-foreground font-medium">VS</span>
+              {isLive && (
+                <span className="text-xs text-destructive font-medium mt-1 animate-pulse">●</span>
+              )}
             </div>
 
             {/* Team 2 */}
@@ -115,7 +135,7 @@ export default function MatchCard({ match, showActions = true }: MatchCardProps)
 
           {/* Match Status/Result */}
           {match.status && (
-            <p className="text-center text-xs text-muted-foreground mt-3 truncate">
+            <p className={`text-center text-xs mt-3 truncate ${isLive ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
               {match.status}
             </p>
           )}
@@ -125,11 +145,11 @@ export default function MatchCard({ match, showActions = true }: MatchCardProps)
         <div className="px-4 pb-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <Calendar className="h-3 w-3" />
-            <span>{formatDate(match.dateTimeGMT || match.date)}</span>
+            <span>{formatDateIST(match.dateTimeGMT || match.date)}</span>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
-            <span>{formatTime(match.dateTimeGMT || match.date)}</span>
+            <span>{formatTimeIST(match.dateTimeGMT || match.date)}</span>
           </div>
           {match.venue && (
             <div className="flex items-center gap-1 truncate">
@@ -151,7 +171,18 @@ export default function MatchCard({ match, showActions = true }: MatchCardProps)
           </div>
         )}
 
-        {showActions && !isUpcoming && (
+        {showActions && isLive && (
+          <div className="px-4 pb-4 flex gap-2">
+            <Button asChild className="flex-1 bg-destructive hover:bg-destructive/90">
+              <Link href={`/match/${match.id}/live-score`}>Live Score</Link>
+            </Button>
+            <Button asChild variant="outline" className="flex-1">
+              <Link href={`/match/${match.id}/contests`}>View Contests</Link>
+            </Button>
+          </div>
+        )}
+
+        {showActions && !isUpcoming && !isLive && (
           <div className="px-4 pb-4">
             <Button asChild variant="outline" className="w-full">
               <Link href={`/match/${match.id}/live-score`}>View Details</Link>

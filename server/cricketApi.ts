@@ -5,6 +5,9 @@
 
 const CRIC_API_BASE = "https://api.cricapi.com/v1";
 
+// IST offset in milliseconds (5 hours 30 minutes)
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
 // Get API key from environment
 function getApiKey(): string {
   const key = process.env.CRICAPI_KEY;
@@ -23,6 +26,7 @@ export interface Match {
   venue: string;
   date: string;
   dateTimeGMT: string;
+  dateTimeIST: string; // Added IST time
   teams: string[];
   teamInfo?: TeamInfo[];
   score?: Score[];
@@ -71,6 +75,92 @@ export interface SquadData {
 }
 
 /**
+ * Convert GMT time string to IST
+ */
+function convertToIST(dateTimeGMT: string): string {
+  try {
+    const gmtDate = new Date(dateTimeGMT);
+    const istDate = new Date(gmtDate.getTime() + IST_OFFSET_MS);
+    return istDate.toISOString().replace('T', ' ').substring(0, 19) + ' IST';
+  } catch {
+    return dateTimeGMT;
+  }
+}
+
+/**
+ * Format date for display in IST
+ */
+export function formatDateIST(dateTimeGMT: string): string {
+  try {
+    const gmtDate = new Date(dateTimeGMT);
+    const istDate = new Date(gmtDate.getTime() + IST_OFFSET_MS);
+    
+    const options: Intl.DateTimeFormatOptions = {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    };
+    
+    return istDate.toLocaleDateString('en-IN', options) + ' IST';
+  } catch {
+    return dateTimeGMT;
+  }
+}
+
+/**
+ * Get match status based on flags and time
+ */
+function getMatchStatus(match: any): 'live' | 'fixture' | 'result' {
+  // If explicitly ended, it's a result
+  if (match.matchEnded === true) {
+    return 'result';
+  }
+  
+  // If explicitly started but not ended, it's live
+  if (match.matchStarted === true && match.matchEnded !== true) {
+    return 'live';
+  }
+  
+  // Check if match should have started based on time
+  if (match.dateTimeGMT) {
+    const matchTime = new Date(match.dateTimeGMT);
+    const now = new Date();
+    
+    // If match time is in the future, it's upcoming
+    if (matchTime > now) {
+      return 'fixture';
+    }
+    
+    // If match time has passed but not marked as ended, check status text
+    const statusLower = (match.status || '').toLowerCase();
+    if (statusLower.includes('won') || 
+        statusLower.includes('draw') || 
+        statusLower.includes('tied') ||
+        statusLower.includes('no result') ||
+        statusLower.includes('abandoned')) {
+      return 'result';
+    }
+    
+    // If status indicates ongoing match
+    if (statusLower.includes('innings') || 
+        statusLower.includes('break') ||
+        statusLower.includes('batting') ||
+        statusLower.includes('bowling') ||
+        statusLower.includes('need') ||
+        statusLower.includes('trail') ||
+        statusLower.includes('lead')) {
+      return 'live';
+    }
+  }
+  
+  // Default based on matchStarted flag
+  return match.matchStarted ? 'live' : 'fixture';
+}
+
+/**
  * Fetch current matches from CricAPI
  * Uses currentMatches endpoint for comprehensive match data
  */
@@ -93,42 +183,63 @@ export async function getMatches(): Promise<Match[]> {
     }
     
     // Transform the data to match our interface
-    const matches: Match[] = (data.data || []).map((match: any) => ({
-      id: match.id,
-      name: match.name,
-      matchType: match.matchType || "unknown",
-      status: match.status,
-      venue: match.venue || "TBD",
-      date: match.date,
-      dateTimeGMT: match.dateTimeGMT,
-      teams: match.teams || [],
-      teamInfo: match.teamInfo,
-      score: match.score,
-      series_id: match.series_id || "",
-      fantasyEnabled: match.fantasyEnabled || false,
-      bbbEnabled: match.bbbEnabled || false,
-      hasSquad: match.hasSquad || false,
-      matchStarted: match.matchStarted || false,
-      matchEnded: match.matchEnded || false,
-      t1: match.teams?.[0] || match.t1,
-      t2: match.teams?.[1] || match.t2,
-      t1img: match.teamInfo?.[0]?.img || "",
-      t2img: match.teamInfo?.[1]?.img || "",
-      t1s: match.score?.find((s: any) => s.inning?.includes(match.teams?.[0]))?.r 
-           ? `${match.score.find((s: any) => s.inning?.includes(match.teams?.[0])).r}/${match.score.find((s: any) => s.inning?.includes(match.teams?.[0])).w} (${match.score.find((s: any) => s.inning?.includes(match.teams?.[0])).o})`
-           : "",
-      t2s: match.score?.find((s: any) => s.inning?.includes(match.teams?.[1]))?.r
-           ? `${match.score.find((s: any) => s.inning?.includes(match.teams?.[1])).r}/${match.score.find((s: any) => s.inning?.includes(match.teams?.[1])).w} (${match.score.find((s: any) => s.inning?.includes(match.teams?.[1])).o})`
-           : "",
-      ms: match.matchEnded ? "result" : match.matchStarted ? "live" : "fixture",
-      series: match.series || "",
-    }));
+    const matches: Match[] = (data.data || []).map((match: any) => {
+      const matchStatus = getMatchStatus(match);
+      
+      return {
+        id: match.id,
+        name: match.name,
+        matchType: match.matchType || "unknown",
+        status: match.status,
+        venue: match.venue || "TBD",
+        date: match.date,
+        dateTimeGMT: match.dateTimeGMT,
+        dateTimeIST: convertToIST(match.dateTimeGMT),
+        teams: match.teams || [],
+        teamInfo: match.teamInfo,
+        score: match.score,
+        series_id: match.series_id || "",
+        fantasyEnabled: match.fantasyEnabled || false,
+        bbbEnabled: match.bbbEnabled || false,
+        hasSquad: match.hasSquad || false,
+        matchStarted: match.matchStarted || false,
+        matchEnded: match.matchEnded || false,
+        t1: match.teams?.[0] || match.t1,
+        t2: match.teams?.[1] || match.t2,
+        t1img: match.teamInfo?.[0]?.img || "",
+        t2img: match.teamInfo?.[1]?.img || "",
+        t1s: formatTeamScore(match.score, match.teams?.[0]),
+        t2s: formatTeamScore(match.score, match.teams?.[1]),
+        ms: matchStatus,
+        series: match.series || "",
+      };
+    });
+    
+    console.log(`[CricketAPI] Fetched ${matches.length} matches`);
     
     return matches;
   } catch (error) {
     console.error("[CricketAPI] Error fetching matches:", error);
     return [];
   }
+}
+
+/**
+ * Format team score from score array
+ */
+function formatTeamScore(scores: any[] | undefined, teamName: string | undefined): string {
+  if (!scores || !teamName) return "";
+  
+  // Find score for this team
+  const teamScore = scores.find(s => {
+    const inning = (s.inning || '').toLowerCase();
+    const team = teamName.toLowerCase();
+    return inning.includes(team);
+  });
+  
+  if (!teamScore) return "";
+  
+  return `${teamScore.r}/${teamScore.w} (${teamScore.o})`;
 }
 
 /**
@@ -223,6 +334,8 @@ export async function getMatchInfo(matchId: string): Promise<Match | null> {
     const match = data.data;
     if (!match) return null;
     
+    const matchStatus = getMatchStatus(match);
+    
     return {
       id: match.id,
       name: match.name,
@@ -231,6 +344,7 @@ export async function getMatchInfo(matchId: string): Promise<Match | null> {
       venue: match.venue || "TBD",
       date: match.date,
       dateTimeGMT: match.dateTimeGMT,
+      dateTimeIST: convertToIST(match.dateTimeGMT),
       teams: match.teams || [],
       teamInfo: match.teamInfo,
       score: match.score,
@@ -246,7 +360,7 @@ export async function getMatchInfo(matchId: string): Promise<Match | null> {
       t2img: match.teamInfo?.[1]?.img || "",
       t1s: formatScore(match.score, match.teams?.[0]),
       t2s: formatScore(match.score, match.teams?.[1]),
-      ms: match.matchEnded ? "result" : match.matchStarted ? "live" : "fixture",
+      ms: matchStatus,
       series: match.series || "",
     };
   } catch (error) {
@@ -276,7 +390,7 @@ export function categorizeMatches(matches: Match[]) {
   const completed: Match[] = [];
 
   for (const match of matches) {
-    const status = match.ms || (match.matchEnded ? "result" : match.matchStarted ? "live" : "fixture");
+    const status = match.ms || getMatchStatus(match);
     
     if (status === "live") {
       live.push(match);
@@ -286,6 +400,23 @@ export function categorizeMatches(matches: Match[]) {
       completed.push(match);
     }
   }
+
+  // Sort by date
+  const sortByDate = (a: Match, b: Match) => {
+    const dateA = new Date(a.dateTimeGMT || a.date);
+    const dateB = new Date(b.dateTimeGMT || b.date);
+    return dateB.getTime() - dateA.getTime(); // Most recent first
+  };
+
+  live.sort(sortByDate);
+  upcoming.sort((a, b) => {
+    const dateA = new Date(a.dateTimeGMT || a.date);
+    const dateB = new Date(b.dateTimeGMT || b.date);
+    return dateA.getTime() - dateB.getTime(); // Soonest first
+  });
+  completed.sort(sortByDate);
+
+  console.log(`[CricketAPI] Categorized: ${live.length} live, ${upcoming.length} upcoming, ${completed.length} completed`);
 
   return { live, upcoming, completed };
 }

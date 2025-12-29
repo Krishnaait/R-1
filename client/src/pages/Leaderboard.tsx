@@ -26,9 +26,12 @@ export default function Leaderboard() {
   const { contestId } = useParams<{ contestId: string }>();
   const { user } = useAuth();
   
-  const { data: leaderboard, isLoading } = trpc.contests.leaderboard.useQuery(
+  const { data: leaderboard, isLoading, refetch, isFetching } = trpc.contests.leaderboard.useQuery(
     { contestId: parseInt(contestId || "0") },
-    { enabled: !!contestId }
+    { 
+      enabled: !!contestId,
+      refetchInterval: 3000, // Auto-refresh every 3 seconds
+    }
   );
 
   const getRankIcon = (rank: number) => {

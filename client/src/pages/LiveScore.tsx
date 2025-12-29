@@ -24,13 +24,17 @@ export default function LiveScore() {
     { matchId: matchId || "" },
     { 
       enabled: !!matchId,
-      refetchInterval: autoRefresh ? 30000 : false, // Auto-refresh every 30 seconds
+      refetchInterval: autoRefresh ? 3000 : false, // Auto-refresh every 3 seconds
     }
   );
 
+  // IST offset in milliseconds (5 hours 30 minutes)
+  const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-IN", {
+    const gmtDate = new Date(dateStr);
+    const istDate = new Date(gmtDate.getTime() + IST_OFFSET_MS);
+    return istDate.toLocaleDateString("en-IN", {
       weekday: "long",
       day: "numeric",
       month: "long",
@@ -39,11 +43,12 @@ export default function LiveScore() {
   };
 
   const formatTime = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleTimeString("en-IN", {
+    const gmtDate = new Date(dateStr);
+    const istDate = new Date(gmtDate.getTime() + IST_OFFSET_MS);
+    return istDate.toLocaleTimeString("en-IN", {
       hour: "2-digit",
       minute: "2-digit",
-    });
+    }) + " IST";
   };
 
   const getStatusBadge = () => {

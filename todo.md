@@ -180,3 +180,27 @@ Based on the 37-page PDF guide "The Ultimate Guide to Building a Fantasy Cricket
 - [x] Update cricketApi.ts to use real API endpoints
 - [x] Test live match data fetching (22 matches returned)
 - [x] Test live squad data fetching
+
+
+## Bug Fixes (Reported Issues)
+
+### Match Display Issues
+- [x] Fix Live matches not showing (API returns no live matches currently)
+- [x] Fix Upcoming matches not showing (API returns no upcoming matches currently)
+- [x] Fix GMT to IST timezone conversion for match times
+- [x] Verify match categorization logic (live/upcoming/completed)
+- [x] Improved empty state UI for all tabs
+- [x] Added auto-refresh every 60 seconds
+- [x] Added manual refresh button
+- [x] Added match count summary
+- [x] Added IST timezone indicator
+
+Note: CricAPI currently returns only completed matches. Live and upcoming matches will appear when available.
+
+
+## Real-Time Updates (New Requirement)
+- [x] Update Matches page to refresh every 3 seconds
+- [x] Update LiveScore page to refresh every 3 seconds
+- [x] Update Leaderboard page to refresh every 3 seconds
+- [x] Update Homepage match sections to refresh every 3 seconds
+- [x] Update Dashboard to refresh every 3 seconds

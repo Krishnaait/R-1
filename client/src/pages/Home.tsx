@@ -49,7 +49,12 @@ const stats = [
 
 export default function Home() {
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { data: matchData, isLoading: matchesLoading } = trpc.cricket.getMatches.useQuery();
+  const { data: matchData, isLoading: matchesLoading } = trpc.cricket.getMatches.useQuery(
+    undefined,
+    {
+      refetchInterval: 3000, // Refetch every 3 seconds for real-time updates
+    }
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

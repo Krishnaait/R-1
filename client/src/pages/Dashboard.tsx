@@ -24,15 +24,26 @@ export default function Dashboard() {
   
   const { data: myTeams, isLoading: teamsLoading } = trpc.teams.myTeams.useQuery(
     undefined,
-    { enabled: isAuthenticated }
+    { 
+      enabled: isAuthenticated,
+      refetchInterval: 3000, // Auto-refresh every 3 seconds
+    }
   );
   
   const { data: myEntries, isLoading: entriesLoading } = trpc.contests.myEntries.useQuery(
     undefined,
-    { enabled: isAuthenticated }
+    { 
+      enabled: isAuthenticated,
+      refetchInterval: 3000, // Auto-refresh every 3 seconds
+    }
   );
   
-  const { data: matchData, isLoading: matchesLoading } = trpc.cricket.getMatches.useQuery();
+  const { data: matchData, isLoading: matchesLoading } = trpc.cricket.getMatches.useQuery(
+    undefined,
+    {
+      refetchInterval: 3000, // Auto-refresh every 3 seconds
+    }
+  );
 
   // Redirect to login if not authenticated
   useEffect(() => {
