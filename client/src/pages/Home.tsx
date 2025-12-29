@@ -14,7 +14,7 @@ import {
   Shield, 
   ArrowRight, 
   Star,
-  TrendingUp,
+  Gamepad2,
   Clock
 } from "lucide-react";
 import { COMPANY_INFO } from "@shared/types";
@@ -28,8 +28,8 @@ const features = [
   },
   {
     icon: Trophy,
-    title: "Compete in Contests",
-    description: "Join exciting contests with different entry fees and prize pools. From free practice to mega contests.",
+    title: "Compete in Free Contests",
+    description: "Join exciting contests and compete for glory. Climb the leaderboard and prove your skills!",
     image: "/images/feature-contest.png",
   },
   {
@@ -43,7 +43,7 @@ const features = [
 const stats = [
   { value: "10L+", label: "Active Users" },
   { value: "500+", label: "Daily Contests" },
-  { value: "₹10Cr+", label: "Prizes Won" },
+  { value: "100%", label: "Free to Play" },
   { value: "100%", label: "Secure" },
 ];
 
@@ -69,7 +69,7 @@ export default function Home() {
             <div className="max-w-3xl mx-auto text-center">
               <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-6">
                 <Star className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium text-primary">India's Trusted Fantasy Platform</span>
+                <span className="text-sm font-medium text-primary">India's Free Fantasy Platform</span>
               </div>
               
               <h1 className="text-4xl md:text-6xl font-display font-bold mb-6">
@@ -80,7 +80,7 @@ export default function Home() {
               
               <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
                 Build your dream cricket team, compete with millions of players, 
-                and win exciting prizes. Experience the thrill of every ball!
+                and climb the leaderboard. Experience the thrill of every ball - completely free!
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -102,7 +102,7 @@ export default function Home() {
                   <>
                     <Button asChild size="lg" className="gradient-brand text-lg px-8">
                       <a href={getLoginUrl()}>
-                        Start Playing Now
+                        Start Playing Free
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </a>
                     </Button>
@@ -236,7 +236,7 @@ export default function Home() {
               {[
                 { step: "01", title: "Select a Match", desc: "Choose from upcoming cricket matches" },
                 { step: "02", title: "Create Your Team", desc: "Pick 11 players within 100 credits" },
-                { step: "03", title: "Join Contests", desc: "Compete and win exciting prizes" },
+                { step: "03", title: "Join Contests", desc: "Compete and earn points for free" },
               ].map((item, index) => (
                 <div key={item.step} className="text-center relative">
                   <div className="h-20 w-20 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center mx-auto mb-4">
@@ -256,7 +256,7 @@ export default function Home() {
               {!isAuthenticated && (
                 <Button asChild size="lg" className="gradient-brand">
                   <a href={getLoginUrl()}>
-                    Get Started Now
+                    Get Started Free
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </a>
                 </Button>
@@ -280,8 +280,8 @@ export default function Home() {
                   </p>
                   <div className="space-y-4">
                     {[
-                      { icon: Shield, text: "100% Secure Transactions" },
-                      { icon: TrendingUp, text: "Instant Withdrawals" },
+                      { icon: Shield, text: "100% Secure Platform" },
+                      { icon: Gamepad2, text: "Free to Play Forever" },
                       { icon: Users, text: "24/7 Customer Support" },
                     ].map((item) => (
                       <div key={item.text} className="flex items-center gap-3">
@@ -313,15 +313,15 @@ export default function Home() {
           <div className="container relative">
             <div className="max-w-3xl mx-auto text-center">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Ready to Start Winning?
+                Ready to Test Your Cricket Skills?
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Join millions of cricket fans and start your fantasy journey today!
+                Join millions of cricket fans and start your fantasy journey today - completely free!
               </p>
               {!isAuthenticated && (
                 <Button asChild size="lg" className="gradient-brand text-lg px-12">
                   <a href={getLoginUrl()}>
-                    Play Now
+                    Play Free Now
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </a>
                 </Button>

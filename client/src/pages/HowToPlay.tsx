@@ -11,7 +11,7 @@ import {
   Star, 
   ArrowRight,
   CheckCircle,
-  Coins
+  Gamepad2
 } from "lucide-react";
 import { COMPANY_INFO } from "@shared/types";
 
@@ -20,7 +20,7 @@ const steps = [
     number: "01",
     icon: Users,
     title: "Select a Match",
-    description: "Browse through upcoming cricket matches and select the one you want to play. Each match has multiple contests with different entry fees and prize pools.",
+    description: "Browse through upcoming cricket matches and select the one you want to play. Each match has multiple free contests to join.",
   },
   {
     number: "02",
@@ -36,9 +36,9 @@ const steps = [
   },
   {
     number: "04",
-    icon: Coins,
-    title: "Join Contests",
-    description: "Enter contests with your team. Choose from free practice contests or paid contests with exciting prize pools.",
+    icon: Gamepad2,
+    title: "Join Free Contests",
+    description: "Enter contests with your team - all contests are completely free! Compete against other players and test your cricket knowledge.",
   },
   {
     number: "05",
@@ -49,8 +49,8 @@ const steps = [
   {
     number: "06",
     icon: Star,
-    title: "Win Prizes",
-    description: "Climb the leaderboard and win exciting prizes. The higher you rank, the bigger your rewards!",
+    title: "Earn Points & Climb Ranks",
+    description: "Climb the leaderboard and earn bragging rights. The higher you rank, the more glory you achieve!",
   },
 ];
 
@@ -91,7 +91,7 @@ export default function HowToPlay() {
               How to Play <span className="gradient-brand-text">Fantasy Cricket</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Learn how to create winning teams, join contests, and win exciting prizes on {COMPANY_INFO.brandName}
+              Learn how to create winning teams, join free contests, and climb the leaderboard on {COMPANY_INFO.brandName}
             </p>
           </div>
         </section>
@@ -187,7 +187,7 @@ export default function HowToPlay() {
           <div className="container text-center">
             <h2 className="text-3xl font-bold mb-4">Ready to Start Playing?</h2>
             <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-              Put your cricket knowledge to the test and win exciting prizes!
+              Put your cricket knowledge to the test - it's completely free!
             </p>
             <Button asChild size="lg" className="gradient-brand">
               <Link href="/matches">

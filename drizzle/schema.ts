@@ -11,6 +11,7 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  totalPoints: int("totalPoints").notNull().default(0), // Lifetime points earned
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -52,14 +53,14 @@ export type TeamPlayer = typeof teamPlayers.$inferSelect;
 export type InsertTeamPlayer = typeof teamPlayers.$inferInsert;
 
 /**
- * Contests - Fantasy cricket contests for matches
+ * Contests - Fantasy cricket contests for matches (Free-to-Play model)
+ * No entry fees or prize pools - purely points-based competition
  */
 export const contests = mysqlTable("contests", {
   id: int("id").autoincrement().primaryKey(),
   matchId: varchar("matchId", { length: 128 }).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
-  entryFee: int("entryFee").notNull().default(0),
-  prizePool: int("prizePool").notNull().default(0),
+  description: varchar("description", { length: 500 }), // Contest description
   maxEntries: int("maxEntries").notNull().default(100),
   currentEntries: int("currentEntries").notNull().default(0),
   status: mysqlEnum("status", ["upcoming", "live", "completed"]).default("upcoming").notNull(),

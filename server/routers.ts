@@ -139,7 +139,7 @@ export const appRouter = router({
       }),
   }),
 
-  // ==================== CONTESTS ====================
+  // ==================== CONTESTS (FREE-TO-PLAY) ====================
   contests: router({
     // Get contests for a match
     getByMatch: publicProcedure
@@ -160,16 +160,16 @@ export const appRouter = router({
         return await db.getContestById(input.contestId);
       }),
 
-    // Seed contests for a match (admin/dev use)
+    // Seed contests for a match (admin/dev use) - FREE-TO-PLAY
     seed: protectedProcedure
       .input(z.object({ matchId: z.string() }))
       .mutation(async ({ input }) => {
         const sampleContests = [
-          { name: "Mega Contest", entryFee: 10, prizePool: 1000, maxEntries: 100 },
-          { name: "Head to Head", entryFee: 50, prizePool: 90, maxEntries: 2 },
-          { name: "Winner Takes All", entryFee: 25, prizePool: 225, maxEntries: 10 },
-          { name: "Free Practice", entryFee: 0, prizePool: 0, maxEntries: 1000 },
-          { name: "Premium League", entryFee: 100, prizePool: 5000, maxEntries: 50 },
+          { name: "Grand League", description: "Compete with 100 players for glory!", maxEntries: 100 },
+          { name: "Head to Head", description: "1v1 battle - prove your skills!", maxEntries: 2 },
+          { name: "Mini League", description: "Small group, big competition!", maxEntries: 10 },
+          { name: "Practice Arena", description: "Perfect your strategy risk-free!", maxEntries: 1000 },
+          { name: "Champions League", description: "Elite competition for top players!", maxEntries: 50 },
         ];
 
         const createdIds: number[] = [];
@@ -184,7 +184,7 @@ export const appRouter = router({
         return { success: true, contestIds: createdIds };
       }),
 
-    // Join a contest
+    // Join a contest (FREE)
     join: protectedProcedure
       .input(z.object({
         contestId: z.number(),
@@ -227,7 +227,7 @@ export const appRouter = router({
           throw new Error("You have already joined this contest");
         }
 
-        // Create entry
+        // Create entry (FREE - no payment required)
         const entryId = await db.createContestEntry({
           contestId: input.contestId,
           userId: ctx.user.id,
@@ -289,10 +289,10 @@ export const appRouter = router({
       const newMatchIds = upcomingMatchIds.filter(id => !existingMatchIds.includes(id));
 
       for (const matchId of newMatchIds) {
-        // Create default contests for new matches
+        // Create default free contests for new matches
         const defaultContests = [
-          { name: "Mega Contest", entryFee: 10, prizePool: 1000, maxEntries: 100 },
-          { name: "Free Practice", entryFee: 0, prizePool: 0, maxEntries: 1000 },
+          { name: "Grand League", description: "Compete with 100 players for glory!", maxEntries: 100 },
+          { name: "Practice Arena", description: "Perfect your strategy risk-free!", maxEntries: 1000 },
         ];
 
         for (const contest of defaultContests) {

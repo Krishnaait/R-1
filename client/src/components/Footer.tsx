@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { COMPANY_INFO } from "@shared/types";
-import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin } from "lucide-react";
 
 const footerLinks = {
   company: [
@@ -17,8 +17,8 @@ const footerLinks = {
   ],
   features: [
     { href: "/matches", label: "Live Matches" },
-    { href: "/dashboard/contests", label: "Contests" },
-    { href: "/dashboard/my-teams", label: "My Teams" },
+    { href: "/my-contests", label: "Contests" },
+    { href: "/my-teams", label: "My Teams" },
     { href: "/dashboard", label: "Dashboard" },
   ],
 };
@@ -46,7 +46,7 @@ export default function Footer() {
             </Link>
             <p className="text-muted-foreground text-sm mb-4 max-w-sm">
               {COMPANY_INFO.tagline} - Experience the thrill of cricket like never before. 
-              Build your dream team, compete in exciting contests, and win big!
+              Build your dream team, compete in free contests, and climb the leaderboard!
             </p>
             
             {/* Contact Info */}
@@ -136,8 +136,8 @@ export default function Footer() {
             © {new Date().getFullYear()} {COMPANY_INFO.name}. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground text-center md:text-right max-w-md">
-            This game involves an element of financial risk and may be addictive. 
-            Please play responsibly and at your own risk.
+            This is a free-to-play fantasy sports platform. No real money is involved. 
+            Play responsibly and enjoy the game!
           </p>
         </div>
       </div>

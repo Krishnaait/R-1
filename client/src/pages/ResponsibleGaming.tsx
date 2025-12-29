@@ -6,7 +6,7 @@ import { Link } from "wouter";
 import { 
   Heart, 
   Clock, 
-  Wallet, 
+  Gamepad2, 
   AlertCircle,
   Phone,
   Shield,
@@ -21,9 +21,9 @@ const tips = [
     description: "Decide how much time you want to spend playing and stick to it. Take regular breaks.",
   },
   {
-    icon: Wallet,
-    title: "Set Budget Limits",
-    description: "Only play with money you can afford to lose. Never chase losses or borrow money to play.",
+    icon: Gamepad2,
+    title: "Play Responsibly",
+    description: "Remember that fantasy sports is a game of skill. Play for fun and entertainment.",
   },
   {
     icon: Heart,
@@ -38,14 +38,14 @@ const tips = [
 ];
 
 const warningSignsData = [
-  "Spending more money than you can afford",
+  "Spending more time than intended on the platform",
   "Playing to escape problems or relieve stress",
-  "Lying to family or friends about your playing habits",
   "Neglecting work, studies, or relationships",
   "Feeling restless or irritable when not playing",
-  "Chasing losses with bigger bets",
-  "Borrowing money to play",
-  "Feeling guilty about your playing habits",
+  "Constantly checking scores and standings",
+  "Feeling frustrated when your team doesn't perform well",
+  "Difficulty sleeping due to thinking about fantasy sports",
+  "Prioritizing fantasy sports over important activities",
 ];
 
 export default function ResponsibleGaming() {
@@ -68,10 +68,26 @@ export default function ResponsibleGaming() {
           </div>
         </section>
 
+        {/* Free to Play Notice */}
+        <section className="py-8 bg-primary/5">
+          <div className="container">
+            <Card className="bg-primary/10 border-primary/20">
+              <CardContent className="p-6 text-center">
+                <Gamepad2 className="h-10 w-10 text-primary mx-auto mb-3" />
+                <h3 className="text-xl font-semibold mb-2">100% Free to Play</h3>
+                <p className="text-muted-foreground">
+                  {COMPANY_INFO.brandName} is a completely free-to-play fantasy sports platform. 
+                  No real money is involved in any contests. Play for fun, compete for glory!
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
         {/* Tips Section */}
         <section className="py-16">
           <div className="container">
-            <h2 className="text-3xl font-bold text-center mb-12">Tips for Responsible Gaming</h2>
+            <h2 className="text-3xl font-bold text-center mb-12">Tips for Healthy Gaming</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {tips.map((tip) => (
@@ -93,20 +109,20 @@ export default function ResponsibleGaming() {
         <section className="py-16 bg-card/50">
           <div className="container">
             <div className="max-w-3xl mx-auto">
-              <Card className="bg-destructive/5 border-destructive/20">
+              <Card className="bg-amber-500/5 border-amber-500/20">
                 <CardContent className="p-8">
                   <div className="flex items-center gap-3 mb-6">
-                    <AlertCircle className="h-8 w-8 text-destructive" />
-                    <h2 className="text-2xl font-bold">Warning Signs</h2>
+                    <AlertCircle className="h-8 w-8 text-amber-500" />
+                    <h2 className="text-2xl font-bold">Signs You May Need a Break</h2>
                   </div>
                   <p className="text-muted-foreground mb-6">
-                    If you recognize any of these signs in yourself or someone you know, 
-                    it may be time to seek help:
+                    Even with free-to-play games, it's important to maintain a healthy balance. 
+                    Consider taking a break if you notice:
                   </p>
                   <ul className="space-y-3">
                     {warningSignsData.map((sign, index) => (
                       <li key={index} className="flex items-start gap-3">
-                        <span className="h-2 w-2 rounded-full bg-destructive mt-2 shrink-0" />
+                        <span className="h-2 w-2 rounded-full bg-amber-500 mt-2 shrink-0" />
                         <span>{sign}</span>
                       </li>
                     ))}
@@ -117,44 +133,45 @@ export default function ResponsibleGaming() {
           </div>
         </section>
 
-        {/* Self-Exclusion Section */}
+        {/* Healthy Gaming Section */}
         <section className="py-16">
           <div className="container">
             <Card className="max-w-4xl mx-auto">
               <CardContent className="p-8 prose prose-invert max-w-none">
-                <h2>Self-Exclusion Options</h2>
+                <h2>Healthy Gaming Practices</h2>
                 <p>
-                  We offer several tools to help you manage your gaming activity:
+                  We encourage all our users to maintain healthy gaming habits:
                 </p>
 
-                <h3>Deposit Limits</h3>
+                <h3>Set Time Limits</h3>
                 <p>
-                  Set daily, weekly, or monthly deposit limits to control your spending. 
-                  Once set, limits cannot be increased for 24 hours.
+                  Decide in advance how much time you want to spend on the platform each day. 
+                  Use phone timers or app limits to help you stick to your goals.
                 </p>
 
-                <h3>Time Limits</h3>
+                <h3>Take Regular Breaks</h3>
                 <p>
-                  Set session time limits to receive reminders when you've been playing 
-                  for a specified duration.
+                  Step away from the screen regularly. Use the 20-20-20 rule: every 20 minutes, 
+                  look at something 20 feet away for 20 seconds.
                 </p>
 
-                <h3>Cooling-Off Period</h3>
+                <h3>Maintain Balance</h3>
                 <p>
-                  Take a break from the platform for 24 hours, 7 days, or 30 days. 
-                  During this period, you won't be able to participate in paid contests.
+                  Fantasy sports should complement your life, not dominate it. Make sure you're 
+                  still engaging in other hobbies, spending time with loved ones, and meeting 
+                  your responsibilities.
                 </p>
 
-                <h3>Self-Exclusion</h3>
+                <h3>Play for Fun</h3>
                 <p>
-                  For longer breaks, you can self-exclude for 6 months or 1 year. 
-                  Contact our support team to activate self-exclusion.
+                  Remember that the primary purpose of fantasy sports is entertainment. 
+                  Winning is exciting, but the real joy comes from the game itself.
                 </p>
 
-                <h3>Permanent Account Closure</h3>
+                <h3>Account Management</h3>
                 <p>
-                  If you wish to permanently close your account, contact our support team. 
-                  This action is irreversible.
+                  If you feel you need a break, you can temporarily deactivate your account 
+                  by contacting our support team. We're here to help.
                 </p>
               </CardContent>
             </Card>
@@ -166,34 +183,31 @@ export default function ResponsibleGaming() {
           <div className="container">
             <div className="max-w-3xl mx-auto text-center">
               <Phone className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h2 className="text-3xl font-bold mb-4">Need Help?</h2>
+              <h2 className="text-3xl font-bold mb-4">Need Support?</h2>
               <p className="text-muted-foreground mb-8">
-                If you or someone you know is struggling with gaming addiction, 
-                please reach out to these resources:
+                If you have any concerns about your gaming habits or need assistance, 
+                please don't hesitate to reach out:
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 <Card>
                   <CardContent className="p-6">
-                    <h3 className="font-semibold mb-2">Gamblers Anonymous India</h3>
+                    <h3 className="font-semibold mb-2">Our Support Team</h3>
                     <p className="text-sm text-muted-foreground">
-                      Support groups and resources for problem gambling
+                      Available 24/7 to help with any concerns
                     </p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-6">
-                    <h3 className="font-semibold mb-2">iCall</h3>
+                    <h3 className="font-semibold mb-2">iCall Helpline</h3>
                     <p className="text-sm text-muted-foreground">
-                      Psychosocial helpline: 9152987821
+                      Psychosocial support: 9152987821
                     </p>
                   </CardContent>
                 </Card>
               </div>
 
-              <p className="text-muted-foreground mb-6">
-                You can also contact our support team for assistance:
-              </p>
               <Button asChild className="gradient-brand">
                 <Link href="/contact">Contact Support</Link>
               </Button>
@@ -206,9 +220,9 @@ export default function ResponsibleGaming() {
           <div className="container text-center">
             <h2 className="text-2xl font-bold mb-4">Our Commitment</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              {COMPANY_INFO.brandName} is committed to promoting responsible gaming. 
-              We continuously work to implement features and policies that protect our users 
-              and ensure a safe, enjoyable gaming environment for everyone.
+              {COMPANY_INFO.brandName} is committed to providing a fun, safe, and healthy 
+              gaming environment. As a free-to-play platform, we focus on the joy of cricket 
+              and friendly competition, not financial stakes.
             </p>
           </div>
         </section>

@@ -7,7 +7,8 @@ import {
   Trophy, 
   Target,
   Heart,
-  Zap
+  Zap,
+  Gamepad2
 } from "lucide-react";
 import { COMPANY_INFO } from "@shared/types";
 
@@ -37,7 +38,7 @@ const values = [
 const stats = [
   { value: "10L+", label: "Active Users" },
   { value: "500+", label: "Daily Contests" },
-  { value: "₹10Cr+", label: "Prizes Distributed" },
+  { value: "100%", label: "Free to Play" },
   { value: "24/7", label: "Support" },
 ];
 
@@ -60,7 +61,7 @@ export default function About() {
               About <span className="gradient-brand-text">{COMPANY_INFO.brandName}</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              {COMPANY_INFO.brandName} is India's premier fantasy cricket platform, 
+              {COMPANY_INFO.brandName} is India's premier free-to-play fantasy cricket platform, 
               bringing the excitement of cricket to millions of fans across the country. 
               We combine cutting-edge technology with our passion for cricket to deliver 
               an unmatched fantasy sports experience.
@@ -82,8 +83,8 @@ export default function About() {
                   </p>
                   <p className="text-muted-foreground">
                     Our platform empowers millions of users to showcase their cricket 
-                    knowledge, compete with friends and strangers alike, and win exciting 
-                    prizes while enjoying every match.
+                    knowledge, compete with friends and strangers alike, and climb the 
+                    leaderboard while enjoying every match - completely free!
                   </p>
                 </div>
                 <div className="relative">
@@ -174,9 +175,9 @@ export default function About() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {[
-                { icon: Zap, text: "Instant withdrawals" },
-                { icon: Shield, text: "100% secure platform" },
-                { icon: Trophy, text: "Exciting prizes daily" },
+                { icon: Gamepad2, text: "100% Free to Play" },
+                { icon: Shield, text: "Secure Platform" },
+                { icon: Trophy, text: "Exciting Competitions" },
               ].map((item, index) => (
                 <div key={index} className="flex items-center justify-center gap-3 p-4">
                   <item.icon className="h-6 w-6 text-primary" />

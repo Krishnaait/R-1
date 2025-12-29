@@ -3,7 +3,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -28,7 +28,7 @@ import {
   Loader2, 
   Trophy, 
   Users, 
-  Coins,
+  Star,
   Plus,
   AlertCircle
 } from "lucide-react";
@@ -37,7 +37,7 @@ import { toast } from "sonner";
 
 export default function MatchContests() {
   const { matchId } = useParams<{ matchId: string }>();
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
   
   const [joinDialogOpen, setJoinDialogOpen] = useState(false);
   const [selectedContest, setSelectedContest] = useState<number | null>(null);
@@ -189,22 +189,19 @@ export default function MatchContests() {
                             
                             <div className="flex flex-wrap items-center gap-4 text-sm">
                               <div className="flex items-center gap-1">
-                                <Trophy className="h-4 w-4 text-yellow-500" />
-                                <span className="text-muted-foreground">Prize Pool:</span>
-                                <span className="font-semibold">₹{contest.prizePool.toLocaleString()}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Coins className="h-4 w-4 text-primary" />
-                                <span className="text-muted-foreground">Entry:</span>
-                                <span className="font-semibold">
-                                  {contest.entryFee === 0 ? "FREE" : `₹${contest.entryFee}`}
-                                </span>
+                                <Star className="h-4 w-4 text-yellow-500" />
+                                <span className="font-semibold text-green-500">Free to Join</span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <Users className="h-4 w-4 text-accent" />
                                 <span className="text-muted-foreground">Spots:</span>
                                 <span className="font-semibold">{spotsLeft} left</span>
                               </div>
+                              {contest.description && (
+                                <div className="text-muted-foreground">
+                                  {contest.description}
+                                </div>
+                              )}
                             </div>
                             
                             <div className="mt-3">
@@ -228,7 +225,7 @@ export default function MatchContests() {
                                 className="gradient-brand"
                                 onClick={() => handleJoinClick(contest.id)}
                               >
-                                Join Contest
+                                Join Free
                               </Button>
                             )}
                           </div>
@@ -275,7 +272,7 @@ export default function MatchContests() {
           <DialogHeader>
             <DialogTitle>Join Contest</DialogTitle>
             <DialogDescription>
-              Select a team to join this contest
+              Select a team to join this free contest
             </DialogDescription>
           </DialogHeader>
           

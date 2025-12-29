@@ -10,7 +10,7 @@ import {
   Users, 
   Zap, 
   ArrowRight, 
-  TrendingUp,
+  Star,
   Calendar,
   Target,
   Loader2
@@ -54,7 +54,7 @@ export default function Dashboard() {
   }
 
   const activeContests = myEntries?.filter(e => e.contestStatus === "live").length || 0;
-  const totalWinnings = 0; // Would be calculated from actual data
+  const totalPoints = myEntries?.reduce((sum, e) => sum + parseFloat(e.points || "0"), 0) || 0;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -126,11 +126,11 @@ export default function Dashboard() {
               <Card>
                 <CardContent className="p-4 flex items-center gap-4">
                   <div className="h-12 w-12 rounded-lg bg-green-500/10 flex items-center justify-center">
-                    <TrendingUp className="h-6 w-6 text-green-500" />
+                    <Star className="h-6 w-6 text-green-500" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">₹{totalWinnings}</p>
-                    <p className="text-sm text-muted-foreground">Total Winnings</p>
+                    <p className="text-2xl font-bold">{totalPoints.toFixed(0)}</p>
+                    <p className="text-sm text-muted-foreground">Total Points</p>
                   </div>
                 </CardContent>
               </Card>
@@ -145,7 +145,7 @@ export default function Dashboard() {
                     My Recent Teams
                   </CardTitle>
                   <Button asChild variant="ghost" size="sm">
-                    <Link href="/dashboard/my-teams">View All</Link>
+                    <Link href="/my-teams">View All</Link>
                   </Button>
                 </CardHeader>
                 <CardContent>
@@ -197,7 +197,7 @@ export default function Dashboard() {
                     My Contests
                   </CardTitle>
                   <Button asChild variant="ghost" size="sm">
-                    <Link href="/dashboard/contests">View All</Link>
+                    <Link href="/my-contests">View All</Link>
                   </Button>
                 </CardHeader>
                 <CardContent>

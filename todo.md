@@ -143,3 +143,40 @@ Based on the 37-page PDF guide "The Ultimate Guide to Building a Fantasy Cricket
 - [x] Create hero background images
 - [x] Create feature images (team, contest, live)
 - [x] Create auth background image
+
+
+## Free-to-Play Conversion (New Requirements)
+
+### Backend Changes
+- [x] Remove entryFee and prizePool from contests table schema
+- [x] Update contest seeding to create free contests only
+- [x] Update contest join logic (no payment validation needed)
+- [x] Remove all mock/demo data from cricketApi.ts
+- [x] Integrate live CricAPI for real match data
+
+### Frontend Changes - Remove Money Content
+- [x] Homepage: Remove "₹10Cr+ Prizes Won" stat, replace with points-based stat
+- [x] Homepage: Update hero text and CTAs to focus on points/rankings
+- [x] Matches page: Remove any prize pool mentions
+- [x] Contests page: Remove entry fees and prize pools display
+- [x] Contest cards: Show "Free to Join" instead of entry fees
+- [x] Leaderboard: Focus on points and rankings, not prizes
+- [x] How to Play: Update "Win Prizes" to "Earn Points"
+- [x] How to Play: Remove all money-related content
+- [x] About page: Update messaging to free-to-play model
+- [x] Footer: Remove any prize-related content
+- [x] Header: Update any money-related navigation items
+
+### Content Updates
+- [x] Replace "Win Prizes" → "Earn Points"
+- [x] Replace "Prize Pool" → "Points Pool" or remove entirely
+- [x] Replace "Entry Fee" → "Free Entry"
+- [x] Update all CTAs to focus on fun/competition, not money
+- [x] Update ResponsibleGaming page for free-to-play model
+- [x] Update Dashboard to show Total Points instead of Total Winnings
+
+### CricAPI Integration
+- [x] Request CricAPI key from user
+- [x] Update cricketApi.ts to use real API endpoints
+- [x] Test live match data fetching (22 matches returned)
+- [x] Test live squad data fetching
