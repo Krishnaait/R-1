@@ -5,6 +5,7 @@ import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
+import { syncContests, verifyCronSecret } from "../cron";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 
@@ -35,6 +36,18 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+  // Cron endpoint for automated contest sync
+  app.get("/api/cron/sync-contests", async (req, res) => {
+    const secret = req.headers["x-cron-secret"] as string | undefined;
+    
+    if (!verifyCronSecret(secret)) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    
+    const result = await syncContests();
+    return res.json(result);
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",
