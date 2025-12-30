@@ -8,7 +8,9 @@ import {
   Target,
   Heart,
   Zap,
-  Gamepad2
+  Gamepad2,
+  BarChart3,
+  Clock
 } from "lucide-react";
 import { COMPANY_INFO } from "@shared/types";
 
@@ -35,11 +37,12 @@ const values = [
   },
 ];
 
-const stats = [
-  { value: "10L+", label: "Active Users" },
-  { value: "500+", label: "Daily Contests" },
-  { value: "100%", label: "Free to Play" },
-  { value: "24/7", label: "Support" },
+// Real platform features instead of fake statistics
+const platformFeatures = [
+  { icon: Gamepad2, value: "100%", label: "Free to Play" },
+  { icon: Zap, value: "Real-Time", label: "Live Updates" },
+  { icon: BarChart3, value: "Detailed", label: "Player Stats" },
+  { icon: Clock, value: "24/7", label: "Available" },
 ];
 
 export default function About() {
@@ -61,10 +64,10 @@ export default function About() {
               About <span className="gradient-brand-text">{COMPANY_INFO.brandName}</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              {COMPANY_INFO.brandName} is India's premier free-to-play fantasy cricket platform, 
-              bringing the excitement of cricket to millions of fans across the country. 
+              {COMPANY_INFO.brandName} is a free-to-play fantasy cricket platform, 
+              bringing the excitement of cricket to fans across the country. 
               We combine cutting-edge technology with our passion for cricket to deliver 
-              an unmatched fantasy sports experience.
+              an engaging fantasy sports experience.
             </p>
           </div>
         </section>
@@ -82,8 +85,8 @@ export default function About() {
                     and competing for glory.
                   </p>
                   <p className="text-muted-foreground">
-                    Our platform empowers millions of users to showcase their cricket 
-                    knowledge, compete with friends and strangers alike, and climb the 
+                    Our platform empowers users to showcase their cricket 
+                    knowledge, compete with friends and other players, and climb the 
                     leaderboard while enjoying every match - completely free!
                   </p>
                 </div>
@@ -97,15 +100,17 @@ export default function About() {
           </div>
         </section>
 
-        {/* Stats Section */}
+        {/* Platform Features Section */}
         <section className="py-16">
           <div className="container">
+            <h2 className="text-3xl font-bold text-center mb-8">What We Offer</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {stats.map((stat) => (
-                <Card key={stat.label}>
+              {platformFeatures.map((feature) => (
+                <Card key={feature.label}>
                   <CardContent className="p-6 text-center">
-                    <p className="text-3xl md:text-4xl font-bold gradient-brand-text">{stat.value}</p>
-                    <p className="text-muted-foreground mt-2">{stat.label}</p>
+                    <feature.icon className="h-8 w-8 text-primary mx-auto mb-3" />
+                    <p className="text-2xl md:text-3xl font-bold gradient-brand-text">{feature.value}</p>
+                    <p className="text-muted-foreground mt-2">{feature.label}</p>
                   </CardContent>
                 </Card>
               ))}

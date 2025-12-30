@@ -22,15 +22,15 @@ const faqCategories = [
       },
       {
         q: "How do I create an account?",
-        a: "Creating an account is simple! Click on the 'Sign Up' button, enter your details, verify your email/phone, and you're ready to start playing. The entire process takes less than 2 minutes.",
+        a: "Creating an account is simple! Click on the 'Sign Up' button, enter your details, and you're ready to start playing. The entire process takes less than 2 minutes.",
       },
       {
-        q: "Is it legal to play fantasy cricket in India?",
-        a: "Yes, fantasy cricket is completely legal in India. It is classified as a game of skill, which is exempt from gambling laws. The Supreme Court of India has recognized fantasy sports as games of skill.",
+        q: "Is it free to play?",
+        a: "Yes! Our platform is 100% free to play. There are no entry fees, no hidden charges, and no real money involved. You compete for points and rankings, not cash prizes.",
       },
       {
         q: "What is the minimum age to play?",
-        a: "You must be at least 18 years old to create an account and participate in paid contests on our platform.",
+        a: "You must be at least 18 years old to create an account and participate on our platform.",
       },
     ],
   },
@@ -60,19 +60,19 @@ const faqCategories = [
     ],
   },
   {
-    category: "Contests & Prizes",
+    category: "Contests & Competition",
     questions: [
       {
         q: "What types of contests are available?",
-        a: "We offer various contest types including: Mega Contests (large prize pools), Head to Head (1v1 battles), Winner Takes All, and Free Practice contests for beginners.",
+        a: "We offer various contest types including: Mega Contests (large participant pools), Head to Head (1v1 battles), and Practice contests for beginners. All contests are free to join!",
       },
       {
         q: "How are winners determined?",
         a: "Winners are determined based on the total points scored by their fantasy team. Points are calculated based on the real-life performance of your selected players.",
       },
       {
-        q: "When do I receive my winnings?",
-        a: "Winnings are credited to your account within 24 hours after the match is completed and results are verified.",
+        q: "What do I win?",
+        a: "You compete for points and leaderboard rankings. Climb the leaderboard to showcase your cricket knowledge and compete with other players for glory!",
       },
       {
         q: "Is there a limit on how many contests I can join?",
@@ -98,23 +98,23 @@ const faqCategories = [
     ],
   },
   {
-    category: "Payments & Withdrawals",
+    category: "Account & Security",
     questions: [
       {
-        q: "What payment methods are accepted?",
-        a: "We accept all major payment methods including UPI, Debit/Credit Cards, Net Banking, and popular wallets like Paytm and PhonePe.",
+        q: "How do I update my profile?",
+        a: "Go to your Dashboard and click on your profile settings to update your information.",
       },
       {
-        q: "How do I withdraw my winnings?",
-        a: "Go to your wallet, click on 'Withdraw', enter the amount and your bank details. Withdrawals are processed within 24-48 hours.",
+        q: "Is my data secure?",
+        a: "Absolutely! We use industry-standard encryption to protect all your personal data and account information.",
       },
       {
-        q: "Is there a minimum withdrawal amount?",
-        a: "Yes, the minimum withdrawal amount is ₹100. There are no withdrawal fees.",
+        q: "How do I reset my password?",
+        a: "Click on 'Forgot Password' on the login page and follow the instructions sent to your registered email.",
       },
       {
-        q: "Are my transactions secure?",
-        a: "Absolutely! We use industry-standard 256-bit SSL encryption to protect all your transactions and personal data.",
+        q: "Can I delete my account?",
+        a: "Yes, you can request account deletion by contacting our support team. Please note that this action is irreversible.",
       },
     ],
   },

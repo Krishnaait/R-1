@@ -30,17 +30,15 @@ export default function Privacy() {
                 <p>
                   {COMPANY_INFO.companyName} ("we", "our", or "us") is committed to protecting your privacy. 
                   This Privacy Policy explains how we collect, use, disclose, and safeguard your information 
-                  when you use our fantasy cricket platform {COMPANY_INFO.brandName}.
+                  when you use our free-to-play fantasy cricket platform {COMPANY_INFO.brandName}.
                 </p>
 
                 <h2>2. Information We Collect</h2>
                 <h3>Personal Information</h3>
                 <ul>
-                  <li>Name, email address, and phone number</li>
-                  <li>Date of birth and gender</li>
-                  <li>Government-issued ID for verification</li>
-                  <li>Bank account details for withdrawals</li>
-                  <li>Address and location data</li>
+                  <li>Name and email address</li>
+                  <li>Account credentials</li>
+                  <li>Profile information you choose to provide</li>
                 </ul>
 
                 <h3>Usage Information</h3>
@@ -55,21 +53,20 @@ export default function Privacy() {
                 <p>We use the collected information to:</p>
                 <ul>
                   <li>Create and manage your account</li>
-                  <li>Process transactions and withdrawals</li>
-                  <li>Verify your identity and prevent fraud</li>
+                  <li>Provide and improve our services</li>
+                  <li>Track your contest participation and points</li>
                   <li>Provide customer support</li>
-                  <li>Send promotional communications (with your consent)</li>
-                  <li>Improve our services and user experience</li>
+                  <li>Send service-related communications</li>
+                  <li>Improve our platform and user experience</li>
                   <li>Comply with legal obligations</li>
                 </ul>
 
                 <h2>4. Information Sharing</h2>
                 <p>We may share your information with:</p>
                 <ul>
-                  <li>Payment processors for transaction processing</li>
-                  <li>Identity verification services</li>
-                  <li>Law enforcement when required by law</li>
                   <li>Service providers who assist in our operations</li>
+                  <li>Law enforcement when required by law</li>
+                  <li>Analytics providers to help us improve our services</li>
                 </ul>
                 <p>
                   We do not sell your personal information to third parties for marketing purposes.
@@ -80,9 +77,9 @@ export default function Privacy() {
                   We implement industry-standard security measures including:
                 </p>
                 <ul>
-                  <li>256-bit SSL encryption for all data transmission</li>
-                  <li>Secure data centers with physical access controls</li>
-                  <li>Regular security audits and penetration testing</li>
+                  <li>SSL encryption for all data transmission</li>
+                  <li>Secure data storage with access controls</li>
+                  <li>Regular security reviews</li>
                   <li>Employee access controls and training</li>
                 </ul>
 

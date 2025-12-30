@@ -15,7 +15,7 @@ const fairPlayRules = [
   {
     icon: CheckCircle,
     title: "One Account Per User",
-    description: "Each user is allowed only one account. Multiple accounts will result in permanent ban and forfeiture of winnings.",
+    description: "Each user is allowed only one account. Multiple accounts will result in permanent ban.",
     color: "text-green-500",
   },
   {
@@ -105,7 +105,6 @@ export default function FairPlay() {
                   <li><strong>Automation:</strong> Using bots, scripts, or automated tools to gain unfair advantage</li>
                   <li><strong>Insider Trading:</strong> Using non-public information about players or matches</li>
                   <li><strong>Match Fixing:</strong> Any involvement in or knowledge of match-fixing activities</li>
-                  <li><strong>Abuse of Promotions:</strong> Creating fake accounts or using fraudulent methods to claim bonuses</li>
                 </ul>
 
                 <h2>Detection and Monitoring</h2>
@@ -125,7 +124,7 @@ export default function FairPlay() {
                 </p>
                 <ul>
                   <li>Warning and temporary account suspension</li>
-                  <li>Forfeiture of winnings and bonus amounts</li>
+                  <li>Forfeiture of points and leaderboard rankings</li>
                   <li>Permanent account termination</li>
                   <li>Legal action in severe cases</li>
                 </ul>

@@ -16,7 +16,9 @@ import {
   ArrowRight, 
   Star,
   Gamepad2,
-  Clock
+  Clock,
+  Target,
+  BarChart3
 } from "lucide-react";
 import { COMPANY_INFO } from "@shared/types";
 
@@ -41,11 +43,12 @@ const features = [
   },
 ];
 
-const stats = [
-  { value: "10L+", label: "Active Users" },
-  { value: "500+", label: "Daily Contests" },
-  { value: "100%", label: "Free to Play" },
-  { value: "100%", label: "Secure" },
+// Real platform features instead of fake statistics
+const platformFeatures = [
+  { icon: Gamepad2, value: "100%", label: "Free to Play" },
+  { icon: Zap, value: "Real-Time", label: "Live Scores" },
+  { icon: Target, value: "100 Cr", label: "Credit System" },
+  { icon: BarChart3, value: "Detailed", label: "Player Stats" },
 ];
 
 export default function Home() {
@@ -78,7 +81,7 @@ export default function Home() {
             <div className="max-w-3xl mx-auto text-center">
               <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-6">
                 <Star className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium text-primary">India's Free Fantasy Platform</span>
+                <span className="text-sm font-medium text-primary">Free Fantasy Cricket Platform</span>
               </div>
               
               <h1 className="text-4xl md:text-6xl font-display font-bold mb-6">
@@ -88,7 +91,7 @@ export default function Home() {
               </h1>
               
               <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Build your dream cricket team, compete with millions of players, 
+                Build your dream cricket team, compete with other players, 
                 and climb the leaderboard. Experience the thrill of every ball - completely free!
               </p>
               
@@ -123,13 +126,14 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Stats */}
+            {/* Platform Features - Real information instead of fake stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-4xl mx-auto">
-              {stats.map((stat) => (
-                <Card key={stat.label} className="bg-card/50 backdrop-blur border-border/50">
+              {platformFeatures.map((feature) => (
+                <Card key={feature.label} className="bg-card/50 backdrop-blur border-border/50">
                   <CardContent className="p-4 text-center">
-                    <p className="text-2xl md:text-3xl font-bold gradient-brand-text">{stat.value}</p>
-                    <p className="text-sm text-muted-foreground">{stat.label}</p>
+                    <feature.icon className="h-6 w-6 text-primary mx-auto mb-2" />
+                    <p className="text-xl md:text-2xl font-bold gradient-brand-text">{feature.value}</p>
+                    <p className="text-sm text-muted-foreground">{feature.label}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -190,7 +194,10 @@ export default function Home() {
               </div>
             ) : (
               <Card className="p-8 text-center">
-                <p className="text-muted-foreground">No upcoming matches at the moment.</p>
+                <p className="text-muted-foreground">No upcoming matches at the moment. Check back soon!</p>
+                <Button asChild variant="link" className="mt-2">
+                  <Link href="/matches?tab=completed">View Completed Matches</Link>
+                </Button>
               </Card>
             )}
           </div>
@@ -274,45 +281,38 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Trust Section */}
-        <section className="py-16 bg-card/50">
+        {/* Completed Matches Section */}
+        <section className="py-16 bg-card/30">
           <div className="container">
-            <div className="max-w-4xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <div>
-                  <h2 className="text-3xl font-bold mb-4">
-                    Play with <span className="gradient-brand-text">Confidence</span>
-                  </h2>
-                  <p className="text-muted-foreground mb-6">
-                    Your security is our top priority. We use industry-leading encryption 
-                    and follow strict fair play guidelines to ensure a safe gaming experience.
-                  </p>
-                  <div className="space-y-4">
-                    {[
-                      { icon: Shield, text: "100% Secure Platform" },
-                      { icon: Gamepad2, text: "Free to Play Forever" },
-                      { icon: Users, text: "24/7 Customer Support" },
-                    ].map((item) => (
-                      <div key={item.text} className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <item.icon className="h-5 w-5 text-primary" />
-                        </div>
-                        <span className="font-medium">{item.text}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="relative">
-                  <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 p-8 flex items-center justify-center">
-                    <img
-                      src="/logo-full.webp"
-                      alt={COMPANY_INFO.brandName}
-                      className="max-w-full max-h-full object-contain"
-                    />
-                  </div>
-                </div>
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <Trophy className="h-6 w-6 text-muted-foreground" />
+                <h2 className="text-2xl md:text-3xl font-bold">Recent Matches</h2>
               </div>
+              <Button asChild variant="ghost">
+                <Link href="/matches?tab=completed">
+                  View All <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
             </div>
+            
+            {matchesLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                  <Card key={i} className="h-64 animate-pulse bg-muted" />
+                ))}
+              </div>
+            ) : matchData?.completed && matchData.completed.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {matchData.completed.slice(0, 3).map((match) => (
+                  <MatchCard key={match.id} match={match} />
+                ))}
+              </div>
+            ) : (
+              <Card className="p-8 text-center">
+                <p className="text-muted-foreground">No completed matches yet.</p>
+              </Card>
+            )}
           </div>
         </section>
 
@@ -321,16 +321,18 @@ export default function Home() {
           <div className="absolute inset-0 gradient-brand opacity-10" />
           <div className="container relative">
             <div className="max-w-3xl mx-auto text-center">
+              <Gamepad2 className="h-16 w-16 text-primary mx-auto mb-6" />
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Ready to Test Your Cricket Skills?
+                Ready to Test Your Cricket Knowledge?
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Join millions of cricket fans and start your fantasy journey today - completely free!
+                Join {COMPANY_INFO.brandName} today and start building your dream team. 
+                It's completely free to play!
               </p>
               {!isAuthenticated && (
-                <Button asChild size="lg" className="gradient-brand text-lg px-12">
+                <Button asChild size="lg" className="gradient-brand text-lg px-8">
                   <a href={getLoginUrl()}>
-                    Play Free Now
+                    Create Free Account
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </a>
                 </Button>
