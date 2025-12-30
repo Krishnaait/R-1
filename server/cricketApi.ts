@@ -114,6 +114,11 @@ export function formatDateIST(dateTimeGMT: string): string {
  * Get match status based on flags and time
  */
 function getMatchStatus(match: any): 'live' | 'fixture' | 'result' {
+  // If ms field is provided directly, use it
+  if (match.ms) {
+    return match.ms;
+  }
+  
   // If explicitly ended, it's a result
   if (match.matchEnded === true) {
     return 'result';
@@ -161,8 +166,8 @@ function getMatchStatus(match: any): 'live' | 'fixture' | 'result' {
 }
 
 /**
- * Fetch current matches from CricAPI
- * Uses currentMatches endpoint for comprehensive match data
+ * Fetch matches from CricAPI using cricScore endpoint
+ * This endpoint provides live, upcoming (fixture), and completed (result) matches
  */
 export async function getMatches(): Promise<Match[]> {
   const apiKey = getApiKey();
@@ -173,16 +178,86 @@ export async function getMatches(): Promise<Match[]> {
   }
 
   try {
-    // Use currentMatches endpoint for more comprehensive data
+    // Use cricScore endpoint as recommended in the PDF guide
+    // This endpoint returns matches with ms field: "live", "fixture", "result"
+    const response = await fetch(`${CRIC_API_BASE}/cricScore?apikey=${apiKey}`);
+    const data = await response.json();
+    
+    if (data.status !== "success") {
+      console.error("[CricketAPI] Failed to fetch matches from cricScore:", data.reason || data);
+      // Fallback to currentMatches endpoint
+      return await getMatchesFromCurrentMatches();
+    }
+    
+    // Transform the data to match our interface
+    const matches: Match[] = (data.data || []).map((match: any) => {
+      return {
+        id: match.id,
+        name: match.name || `${match.t1} vs ${match.t2}`,
+        matchType: match.matchType || "unknown",
+        status: match.status || "",
+        venue: match.venue || "TBD",
+        date: match.date || match.dateTimeGMT,
+        dateTimeGMT: match.dateTimeGMT,
+        dateTimeIST: convertToIST(match.dateTimeGMT),
+        teams: match.teams || [match.t1, match.t2].filter(Boolean),
+        teamInfo: match.teamInfo || [
+          { name: match.t1, shortname: match.t1, img: match.t1img || "" },
+          { name: match.t2, shortname: match.t2, img: match.t2img || "" },
+        ],
+        score: match.score,
+        series_id: match.series_id || "",
+        fantasyEnabled: match.fantasyEnabled || false,
+        bbbEnabled: match.bbbEnabled || false,
+        hasSquad: match.hasSquad || false,
+        matchStarted: match.matchStarted || match.ms === 'live' || match.ms === 'result',
+        matchEnded: match.matchEnded || match.ms === 'result',
+        t1: match.t1 || match.teams?.[0],
+        t2: match.t2 || match.teams?.[1],
+        t1img: match.t1img || match.teamInfo?.[0]?.img || "",
+        t2img: match.t2img || match.teamInfo?.[1]?.img || "",
+        t1s: match.t1s || "",
+        t2s: match.t2s || "",
+        ms: match.ms || getMatchStatus(match),
+        series: match.series || "",
+      };
+    });
+    
+    console.log(`[CricketAPI] Fetched ${matches.length} matches from cricScore`);
+    
+    // Log breakdown by status
+    const live = matches.filter(m => m.ms === 'live');
+    const fixture = matches.filter(m => m.ms === 'fixture');
+    const result = matches.filter(m => m.ms === 'result');
+    console.log(`[CricketAPI] Breakdown: ${live.length} live, ${fixture.length} upcoming, ${result.length} completed`);
+    
+    return matches;
+  } catch (error) {
+    console.error("[CricketAPI] Error fetching matches from cricScore:", error);
+    // Fallback to currentMatches endpoint
+    return await getMatchesFromCurrentMatches();
+  }
+}
+
+/**
+ * Fallback: Fetch matches from currentMatches endpoint
+ */
+async function getMatchesFromCurrentMatches(): Promise<Match[]> {
+  const apiKey = getApiKey();
+  
+  if (!apiKey) {
+    return [];
+  }
+
+  try {
     const response = await fetch(`${CRIC_API_BASE}/currentMatches?apikey=${apiKey}&offset=0`);
     const data = await response.json();
     
     if (data.status !== "success") {
-      console.error("[CricketAPI] Failed to fetch matches:", data.reason || data);
+      console.error("[CricketAPI] Failed to fetch from currentMatches:", data.reason || data);
       return [];
     }
     
-    // Transform the data to match our interface
     const matches: Match[] = (data.data || []).map((match: any) => {
       const matchStatus = getMatchStatus(match);
       
@@ -215,11 +290,11 @@ export async function getMatches(): Promise<Match[]> {
       };
     });
     
-    console.log(`[CricketAPI] Fetched ${matches.length} matches`);
+    console.log(`[CricketAPI] Fetched ${matches.length} matches from currentMatches (fallback)`);
     
     return matches;
   } catch (error) {
-    console.error("[CricketAPI] Error fetching matches:", error);
+    console.error("[CricketAPI] Error fetching from currentMatches:", error);
     return [];
   }
 }
@@ -450,88 +525,20 @@ export interface PlayerStats {
     fifties: number;
     hundreds: number;
     highestScore: string;
-    fours?: number;
-    sixes?: number;
+    notOuts: number;
+    fours: number;
+    sixes: number;
   };
   bowling: {
     matches: number;
     innings: number;
     wickets: number;
-    average: number;
     economy: number;
-    strikeRate: number;
+    average: number;
     bestBowling: string;
     fiveWickets: number;
+    tenWickets: number;
   };
-}
-
-/**
- * Parse stats array from CricAPI into structured format
- */
-function parsePlayerStats(stats: any[], matchType: string = 't20'): { batting: any; bowling: any } {
-  const batting: any = {
-    matches: 0,
-    innings: 0,
-    runs: 0,
-    average: 0,
-    strikeRate: 0,
-    fifties: 0,
-    hundreds: 0,
-    highestScore: '-',
-    fours: 0,
-    sixes: 0,
-  };
-  
-  const bowling: any = {
-    matches: 0,
-    innings: 0,
-    wickets: 0,
-    average: 0,
-    economy: 0,
-    strikeRate: 0,
-    bestBowling: '-',
-    fiveWickets: 0,
-  };
-  
-  if (!stats || !Array.isArray(stats)) {
-    return { batting, bowling };
-  }
-  
-  // Filter stats for the specified match type
-  const relevantStats = stats.filter(s => s.matchtype === matchType);
-  
-  for (const stat of relevantStats) {
-    const value = stat.value?.trim() || '0';
-    const numValue = parseFloat(value) || 0;
-    
-    if (stat.fn === 'batting') {
-      switch (stat.stat?.trim()) {
-        case 'm': batting.matches = numValue; break;
-        case 'inn': batting.innings = numValue; break;
-        case 'runs': batting.runs = numValue; break;
-        case 'avg': batting.average = numValue; break;
-        case 'sr': batting.strikeRate = numValue; break;
-        case '50s': batting.fifties = numValue; break;
-        case '100s': batting.hundreds = numValue; break;
-        case 'hs': batting.highestScore = value; break;
-        case '4s': batting.fours = numValue; break;
-        case '6s': batting.sixes = numValue; break;
-      }
-    } else if (stat.fn === 'bowling') {
-      switch (stat.stat?.trim()) {
-        case 'm': bowling.matches = numValue; break;
-        case 'inn': bowling.innings = numValue; break;
-        case 'wkts': bowling.wickets = numValue; break;
-        case 'avg': bowling.average = numValue; break;
-        case 'econ': bowling.economy = numValue; break;
-        case 'sr': bowling.strikeRate = numValue; break;
-        case 'bbi': bowling.bestBowling = value; break;
-        case '5w': bowling.fiveWickets = numValue; break;
-      }
-    }
-  }
-  
-  return { batting, bowling };
 }
 
 /**
@@ -546,28 +553,58 @@ export async function getPlayerStats(playerId: string, matchType: string = 't20'
   }
 
   try {
-    const response = await fetch(`${CRIC_API_BASE}/players_info?apikey=${apiKey}&id=${playerId}`);
-    const data = await response.json();
+    // First get player info
+    const infoResponse = await fetch(`${CRIC_API_BASE}/players_info?apikey=${apiKey}&id=${playerId}`);
+    const infoData = await infoResponse.json();
     
-    if (data.status !== "success" || !data.data) {
-      console.error("[CricketAPI] Failed to fetch player stats:", data.reason || data);
+    if (infoData.status !== "success" || !infoData.data) {
+      console.error("[CricketAPI] Failed to fetch player info:", infoData.reason || infoData);
       return null;
     }
     
-    const player = data.data;
-    const { batting, bowling } = parsePlayerStats(player.stats, matchType);
+    const player = infoData.data;
+    
+    // Extract stats based on match type
+    const stats = player.stats || [];
+    const battingStats = stats.find((s: any) => 
+      s.fn === 'batting' && s.matchtype?.toLowerCase() === matchType.toLowerCase()
+    ) || {};
+    const bowlingStats = stats.find((s: any) => 
+      s.fn === 'bowling' && s.matchtype?.toLowerCase() === matchType.toLowerCase()
+    ) || {};
     
     return {
-      id: player.id,
-      name: player.name,
-      country: player.country || '',
+      id: player.id || playerId,
+      name: player.name || "Unknown",
+      country: player.country || "Unknown",
       dateOfBirth: player.dateOfBirth,
-      role: player.role || inferRoleFromStats(batting, bowling),
+      role: player.role || player.playingRole,
       battingStyle: player.battingStyle,
       bowlingStyle: player.bowlingStyle,
       placeOfBirth: player.placeOfBirth,
-      batting,
-      bowling,
+      batting: {
+        matches: parseInt(battingStats.m) || 0,
+        innings: parseInt(battingStats.inn) || 0,
+        runs: parseInt(battingStats.r) || 0,
+        average: parseFloat(battingStats.avg) || 0,
+        strikeRate: parseFloat(battingStats.sr) || 0,
+        fifties: parseInt(battingStats['50']) || 0,
+        hundreds: parseInt(battingStats['100']) || 0,
+        highestScore: battingStats.hs || "0",
+        notOuts: parseInt(battingStats.no) || 0,
+        fours: parseInt(battingStats['4s']) || 0,
+        sixes: parseInt(battingStats['6s']) || 0,
+      },
+      bowling: {
+        matches: parseInt(bowlingStats.m) || 0,
+        innings: parseInt(bowlingStats.inn) || 0,
+        wickets: parseInt(bowlingStats.wkts) || 0,
+        economy: parseFloat(bowlingStats.econ) || 0,
+        average: parseFloat(bowlingStats.avg) || 0,
+        bestBowling: bowlingStats.bbm || "0/0",
+        fiveWickets: parseInt(bowlingStats['5w']) || 0,
+        tenWickets: parseInt(bowlingStats['10w']) || 0,
+      },
     };
   } catch (error) {
     console.error("[CricketAPI] Error fetching player stats:", error);
@@ -576,31 +613,9 @@ export async function getPlayerStats(playerId: string, matchType: string = 't20'
 }
 
 /**
- * Infer player role from stats
- */
-function inferRoleFromStats(batting: any, bowling: any): string {
-  const batMatches = batting.matches || 0;
-  const bowlMatches = bowling.matches || 0;
-  const wickets = bowling.wickets || 0;
-  const runs = batting.runs || 0;
-  
-  // If player has significant bowling stats
-  if (wickets > 20 && bowlMatches > 10) {
-    // If also has significant batting stats, all-rounder
-    if (runs > 500 && batting.average > 20) {
-      return 'All-Rounder';
-    }
-    return 'Bowler';
-  }
-  
-  // Default to batsman
-  return 'Batsman';
-}
-
-/**
  * Search for players by name
  */
-export async function searchPlayers(searchTerm: string): Promise<{ id: string; name: string; country: string }[]> {
+export async function searchPlayers(searchTerm: string): Promise<Player[]> {
   const apiKey = getApiKey();
   
   if (!apiKey) {
@@ -620,7 +635,7 @@ export async function searchPlayers(searchTerm: string): Promise<{ id: string; n
     return (data.data || []).map((player: any) => ({
       id: player.id,
       name: player.name,
-      country: player.country || '',
+      country: player.country,
     }));
   } catch (error) {
     console.error("[CricketAPI] Error searching players:", error);

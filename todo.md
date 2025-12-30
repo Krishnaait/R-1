@@ -249,3 +249,9 @@ Note: CricAPI currently returns only completed matches. Live and upcoming matche
 - [x] Update Terms page for free-to-play model
 - [x] Update Privacy page to remove financial data collection
 - [x] Update FairPlay page to remove winnings references
+
+
+## Fix Upcoming Matches Display (User Request)
+- [ ] Investigate CricAPI endpoints for upcoming matches
+- [ ] Update cricapi.ts to fetch upcoming matches correctly
+- [ ] Test and verify upcoming matches display on homepage and matches page
