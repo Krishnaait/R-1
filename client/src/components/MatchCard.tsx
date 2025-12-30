@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { Calendar, MapPin, Clock } from "lucide-react";
 import type { Match } from "@shared/types";
+import MatchNotificationButton from "./MatchNotificationButton";
 
 interface MatchCardProps {
   match: Match;
@@ -67,10 +68,18 @@ export default function MatchCard({ match, showActions = true }: MatchCardProps)
       <CardContent className="p-0">
         {/* Match Header */}
         <div className={`px-4 py-2 flex items-center justify-between ${isLive ? 'bg-gradient-to-r from-destructive/20 to-destructive/10' : 'bg-gradient-to-r from-primary/10 to-accent/10'}`}>
-          <span className="text-xs text-muted-foreground truncate max-w-[60%]">
+          <span className="text-xs text-muted-foreground truncate max-w-[50%]">
             {match.series || match.name}
           </span>
-          {getStatusBadge()}
+          <div className="flex items-center gap-2">
+            {isUpcoming && (
+              <MatchNotificationButton 
+                matchId={match.id} 
+                matchName={`${match.t1 || match.teams?.[0]} vs ${match.t2 || match.teams?.[1]}`}
+              />
+            )}
+            {getStatusBadge()}
+          </div>
         </div>
 
         {/* Teams */}

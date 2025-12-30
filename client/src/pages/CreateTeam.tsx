@@ -3,6 +3,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PlayerStatsModal from "@/components/PlayerStatsModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +17,9 @@ import {
   Crown, 
   Star, 
   Users,
-  AlertCircle
+  AlertCircle,
+  BarChart3,
+  Info
 } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useEffect } from "react";
@@ -41,6 +44,10 @@ export default function CreateTeam() {
   const [captainId, setCaptainId] = useState<string>("");
   const [viceCaptainId, setViceCaptainId] = useState<string>("");
   const [teamName, setTeamName] = useState("");
+  
+  // Player stats modal state
+  const [statsModalOpen, setStatsModalOpen] = useState(false);
+  const [selectedPlayerForStats, setSelectedPlayerForStats] = useState<{ id: string; name: string } | null>(null);
   
   const { data: squad, isLoading: squadLoading } = trpc.cricket.getSquad.useQuery(
     { matchId: matchId || "" },
@@ -97,6 +104,12 @@ export default function CreateTeam() {
       }
       setSelectedPlayers(prev => [...prev, player]);
     }
+  };
+
+  const openPlayerStats = (e: React.MouseEvent, player: { id: string; name: string }) => {
+    e.stopPropagation();
+    setSelectedPlayerForStats(player);
+    setStatsModalOpen(true);
   };
 
   const handleCaptainSelect = (playerId: string) => {
@@ -219,6 +232,12 @@ export default function CreateTeam() {
           <div className="container">
             {step === "select" && (
               <>
+                {/* Info Banner */}
+                <div className="mb-6 p-3 bg-primary/10 border border-primary/20 rounded-lg flex items-center gap-2 text-sm">
+                  <Info className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span>Click the <BarChart3 className="h-4 w-4 inline mx-1" /> icon on any player card to view detailed statistics</span>
+                </div>
+
                 {squad && squad.length > 0 ? (
                   <div className="space-y-8">
                     {squad.map((team) => (
@@ -244,7 +263,16 @@ export default function CreateTeam() {
                                 <CardContent className="p-4">
                                   <div className="flex items-start justify-between">
                                     <div className="flex-1">
-                                      <p className="font-medium">{player.name}</p>
+                                      <div className="flex items-center gap-2">
+                                        <p className="font-medium">{player.name}</p>
+                                        <button
+                                          onClick={(e) => openPlayerStats(e, { id: player.id, name: player.name })}
+                                          className="p-1 hover:bg-primary/20 rounded transition-colors"
+                                          title="View Player Stats"
+                                        >
+                                          <BarChart3 className="h-4 w-4 text-primary" />
+                                        </button>
+                                      </div>
                                       <p className="text-sm text-muted-foreground">{player.role || "Player"}</p>
                                     </div>
                                     <div className="text-right">
@@ -298,20 +326,28 @@ export default function CreateTeam() {
                     <CardContent>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {selectedPlayers.map((player) => (
-                          <Button
-                            key={player.id}
-                            variant={captainId === player.id ? "default" : "outline"}
-                            className="justify-start h-auto py-3"
-                            onClick={() => handleCaptainSelect(player.id)}
-                          >
-                            <div className="text-left">
-                              <p className="font-medium">{player.name}</p>
-                              <p className="text-xs opacity-70">{player.role}</p>
-                            </div>
-                            {captainId === player.id && (
-                              <Crown className="h-4 w-4 ml-auto text-yellow-500" />
-                            )}
-                          </Button>
+                          <div key={player.id} className="flex items-center gap-2">
+                            <Button
+                              variant={captainId === player.id ? "default" : "outline"}
+                              className="flex-1 justify-start h-auto py-3"
+                              onClick={() => handleCaptainSelect(player.id)}
+                            >
+                              <div className="text-left">
+                                <p className="font-medium">{player.name}</p>
+                                <p className="text-xs opacity-70">{player.role}</p>
+                              </div>
+                              {captainId === player.id && (
+                                <Crown className="h-4 w-4 ml-auto text-yellow-500" />
+                              )}
+                            </Button>
+                            <button
+                              onClick={(e) => openPlayerStats(e, { id: player.id, name: player.name })}
+                              className="p-2 hover:bg-primary/20 rounded transition-colors"
+                              title="View Player Stats"
+                            >
+                              <BarChart3 className="h-4 w-4 text-primary" />
+                            </button>
+                          </div>
                         ))}
                       </div>
                     </CardContent>
@@ -327,21 +363,29 @@ export default function CreateTeam() {
                     <CardContent>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {selectedPlayers.map((player) => (
-                          <Button
-                            key={player.id}
-                            variant={viceCaptainId === player.id ? "default" : "outline"}
-                            className="justify-start h-auto py-3"
-                            onClick={() => handleViceCaptainSelect(player.id)}
-                            disabled={captainId === player.id}
-                          >
-                            <div className="text-left">
-                              <p className="font-medium">{player.name}</p>
-                              <p className="text-xs opacity-70">{player.role}</p>
-                            </div>
-                            {viceCaptainId === player.id && (
-                              <Star className="h-4 w-4 ml-auto text-orange-500" />
-                            )}
-                          </Button>
+                          <div key={player.id} className="flex items-center gap-2">
+                            <Button
+                              variant={viceCaptainId === player.id ? "default" : "outline"}
+                              className="flex-1 justify-start h-auto py-3"
+                              onClick={() => handleViceCaptainSelect(player.id)}
+                              disabled={captainId === player.id}
+                            >
+                              <div className="text-left">
+                                <p className="font-medium">{player.name}</p>
+                                <p className="text-xs opacity-70">{player.role}</p>
+                              </div>
+                              {viceCaptainId === player.id && (
+                                <Star className="h-4 w-4 ml-auto text-orange-500" />
+                              )}
+                            </Button>
+                            <button
+                              onClick={(e) => openPlayerStats(e, { id: player.id, name: player.name })}
+                              className="p-2 hover:bg-primary/20 rounded transition-colors"
+                              title="View Player Stats"
+                            >
+                              <BarChart3 className="h-4 w-4 text-primary" />
+                            </button>
+                          </div>
                         ))}
                       </div>
                     </CardContent>
@@ -433,6 +477,14 @@ export default function CreateTeam() {
       </main>
 
       <Footer />
+
+      {/* Player Stats Modal */}
+      <PlayerStatsModal
+        playerId={selectedPlayerForStats?.id || null}
+        playerName={selectedPlayerForStats?.name || ""}
+        open={statsModalOpen}
+        onOpenChange={setStatsModalOpen}
+      />
     </div>
   );
 }

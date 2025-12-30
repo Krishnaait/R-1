@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
-import { getMatches, getMatchSquad, getMatchInfo, categorizeMatches, generatePlayerCredits } from "./cricketApi";
+import { getMatches, getMatchSquad, getMatchInfo, categorizeMatches, generatePlayerCredits, getPlayerStats, searchPlayers } from "./cricketApi";
 
 export const appRouter = router({
   system: systemRouter,
@@ -51,6 +51,24 @@ export const appRouter = router({
             credits: generatePlayerCredits(),
           })),
         }));
+      }),
+
+    // Get player statistics
+    getPlayerStats: publicProcedure
+      .input(z.object({ 
+        playerId: z.string(),
+        matchType: z.string().optional().default('t20'),
+      }))
+      .query(async ({ input }) => {
+        const stats = await getPlayerStats(input.playerId, input.matchType);
+        return stats;
+      }),
+
+    // Search players
+    searchPlayers: publicProcedure
+      .input(z.object({ searchTerm: z.string().min(2) }))
+      .query(async ({ input }) => {
+        return await searchPlayers(input.searchTerm);
       }),
   }),
 

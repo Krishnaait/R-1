@@ -427,3 +427,203 @@ export function categorizeMatches(matches: Match[]) {
 export function generatePlayerCredits(): number {
   return Math.floor(Math.random() * 4) + 7; // 7, 8, 9, or 10
 }
+
+
+/**
+ * Player Statistics Interface
+ */
+export interface PlayerStats {
+  id: string;
+  name: string;
+  country: string;
+  dateOfBirth?: string;
+  role?: string;
+  battingStyle?: string;
+  bowlingStyle?: string;
+  placeOfBirth?: string;
+  batting: {
+    matches: number;
+    innings: number;
+    runs: number;
+    average: number;
+    strikeRate: number;
+    fifties: number;
+    hundreds: number;
+    highestScore: string;
+    fours?: number;
+    sixes?: number;
+  };
+  bowling: {
+    matches: number;
+    innings: number;
+    wickets: number;
+    average: number;
+    economy: number;
+    strikeRate: number;
+    bestBowling: string;
+    fiveWickets: number;
+  };
+}
+
+/**
+ * Parse stats array from CricAPI into structured format
+ */
+function parsePlayerStats(stats: any[], matchType: string = 't20'): { batting: any; bowling: any } {
+  const batting: any = {
+    matches: 0,
+    innings: 0,
+    runs: 0,
+    average: 0,
+    strikeRate: 0,
+    fifties: 0,
+    hundreds: 0,
+    highestScore: '-',
+    fours: 0,
+    sixes: 0,
+  };
+  
+  const bowling: any = {
+    matches: 0,
+    innings: 0,
+    wickets: 0,
+    average: 0,
+    economy: 0,
+    strikeRate: 0,
+    bestBowling: '-',
+    fiveWickets: 0,
+  };
+  
+  if (!stats || !Array.isArray(stats)) {
+    return { batting, bowling };
+  }
+  
+  // Filter stats for the specified match type
+  const relevantStats = stats.filter(s => s.matchtype === matchType);
+  
+  for (const stat of relevantStats) {
+    const value = stat.value?.trim() || '0';
+    const numValue = parseFloat(value) || 0;
+    
+    if (stat.fn === 'batting') {
+      switch (stat.stat?.trim()) {
+        case 'm': batting.matches = numValue; break;
+        case 'inn': batting.innings = numValue; break;
+        case 'runs': batting.runs = numValue; break;
+        case 'avg': batting.average = numValue; break;
+        case 'sr': batting.strikeRate = numValue; break;
+        case '50s': batting.fifties = numValue; break;
+        case '100s': batting.hundreds = numValue; break;
+        case 'hs': batting.highestScore = value; break;
+        case '4s': batting.fours = numValue; break;
+        case '6s': batting.sixes = numValue; break;
+      }
+    } else if (stat.fn === 'bowling') {
+      switch (stat.stat?.trim()) {
+        case 'm': bowling.matches = numValue; break;
+        case 'inn': bowling.innings = numValue; break;
+        case 'wkts': bowling.wickets = numValue; break;
+        case 'avg': bowling.average = numValue; break;
+        case 'econ': bowling.economy = numValue; break;
+        case 'sr': bowling.strikeRate = numValue; break;
+        case 'bbi': bowling.bestBowling = value; break;
+        case '5w': bowling.fiveWickets = numValue; break;
+      }
+    }
+  }
+  
+  return { batting, bowling };
+}
+
+/**
+ * Fetch player statistics from CricAPI
+ */
+export async function getPlayerStats(playerId: string, matchType: string = 't20'): Promise<PlayerStats | null> {
+  const apiKey = getApiKey();
+  
+  if (!apiKey) {
+    console.error("[CricketAPI] No API key available for player stats");
+    return null;
+  }
+
+  try {
+    const response = await fetch(`${CRIC_API_BASE}/players_info?apikey=${apiKey}&id=${playerId}`);
+    const data = await response.json();
+    
+    if (data.status !== "success" || !data.data) {
+      console.error("[CricketAPI] Failed to fetch player stats:", data.reason || data);
+      return null;
+    }
+    
+    const player = data.data;
+    const { batting, bowling } = parsePlayerStats(player.stats, matchType);
+    
+    return {
+      id: player.id,
+      name: player.name,
+      country: player.country || '',
+      dateOfBirth: player.dateOfBirth,
+      role: player.role || inferRoleFromStats(batting, bowling),
+      battingStyle: player.battingStyle,
+      bowlingStyle: player.bowlingStyle,
+      placeOfBirth: player.placeOfBirth,
+      batting,
+      bowling,
+    };
+  } catch (error) {
+    console.error("[CricketAPI] Error fetching player stats:", error);
+    return null;
+  }
+}
+
+/**
+ * Infer player role from stats
+ */
+function inferRoleFromStats(batting: any, bowling: any): string {
+  const batMatches = batting.matches || 0;
+  const bowlMatches = bowling.matches || 0;
+  const wickets = bowling.wickets || 0;
+  const runs = batting.runs || 0;
+  
+  // If player has significant bowling stats
+  if (wickets > 20 && bowlMatches > 10) {
+    // If also has significant batting stats, all-rounder
+    if (runs > 500 && batting.average > 20) {
+      return 'All-Rounder';
+    }
+    return 'Bowler';
+  }
+  
+  // Default to batsman
+  return 'Batsman';
+}
+
+/**
+ * Search for players by name
+ */
+export async function searchPlayers(searchTerm: string): Promise<{ id: string; name: string; country: string }[]> {
+  const apiKey = getApiKey();
+  
+  if (!apiKey) {
+    console.error("[CricketAPI] No API key available for player search");
+    return [];
+  }
+
+  try {
+    const response = await fetch(`${CRIC_API_BASE}/players?apikey=${apiKey}&offset=0&search=${encodeURIComponent(searchTerm)}`);
+    const data = await response.json();
+    
+    if (data.status !== "success") {
+      console.error("[CricketAPI] Failed to search players:", data.reason || data);
+      return [];
+    }
+    
+    return (data.data || []).map((player: any) => ({
+      id: player.id,
+      name: player.name,
+      country: player.country || '',
+    }));
+  } catch (error) {
+    console.error("[CricketAPI] Error searching players:", error);
+    return [];
+  }
+}

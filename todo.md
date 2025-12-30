@@ -204,3 +204,34 @@ Note: CricAPI currently returns only completed matches. Live and upcoming matche
 - [x] Update Leaderboard page to refresh every 3 seconds
 - [x] Update Homepage match sections to refresh every 3 seconds
 - [x] Update Dashboard to refresh every 3 seconds
+
+
+## New Features (User Request - Dec 30, 2025)
+
+### 1. Player Statistics Display
+- [x] Fetch player statistics from CricAPI (batting avg, strike rate, bowling economy)
+- [x] Create PlayerStatsModal component for detailed stats view
+- [x] Add "View Stats" button to player cards in CreateTeam.tsx
+- [x] Display batting stats: matches, innings, runs, average, strike rate, 50s, 100s
+- [x] Display bowling stats: wickets, economy, average, best bowling
+
+### 2. Push Notifications
+- [x] Create NotificationContext for managing browser notifications
+- [x] Create NotificationBell component for header
+- [x] Create MatchNotificationButton for subscribing to match alerts
+- [x] Implement notification permission request flow
+- [x] Add notification when subscribed match goes live
+- [x] Create useMatchNotifications hook for monitoring match status
+- [x] Store notification preferences in localStorage
+
+### 3. Image Optimization (WebP Conversion)
+- [x] Convert hero-bg.png to WebP (96% smaller)
+- [x] Convert auth-bg.png to WebP (99% smaller)
+- [x] Convert feature-team.png to WebP (96% smaller)
+- [x] Convert feature-contest.png to WebP (97% smaller)
+- [x] Convert feature-live.png to WebP (95% smaller)
+- [x] Convert about-hero.png to WebP (97% smaller)
+- [x] Convert faq-hero.png to WebP (94% smaller)
+- [x] Convert logo-full.png to WebP (99% smaller)
+- [x] Convert logo-icon.png to WebP (98% smaller)
+- [x] Update all image references in code to use WebP

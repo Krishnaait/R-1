@@ -39,7 +39,7 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <img src="/logo-icon.png" alt="IMAGINITIATE" className="h-10 w-10" />
+              <img src="/logo-icon.webp" alt="IMAGINITIATE" className="h-10 w-10" />
               <span className="font-display text-xl font-bold gradient-brand-text">
                 IMAGINITIATE
               </span>

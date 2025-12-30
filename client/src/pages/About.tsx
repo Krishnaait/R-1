@@ -52,7 +52,7 @@ export default function About() {
         <section className="relative py-20 overflow-hidden">
           <div 
             className="absolute inset-0 bg-cover bg-center opacity-20"
-            style={{ backgroundImage: "url('/images/about-hero.png')" }}
+            style={{ backgroundImage: "url('/images/about-hero.webp')" }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background" />
           

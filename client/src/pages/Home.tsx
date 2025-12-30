@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useMatchNotifications } from "@/hooks/useMatchNotifications";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
@@ -24,19 +25,19 @@ const features = [
     icon: Users,
     title: "Build Your Dream Team",
     description: "Select 11 players within 100 credits. Choose your captain (2x) and vice-captain (1.5x) wisely.",
-    image: "/images/feature-team.png",
+    image: "/images/feature-team.webp",
   },
   {
     icon: Trophy,
     title: "Compete in Free Contests",
     description: "Join exciting contests and compete for glory. Climb the leaderboard and prove your skills!",
-    image: "/images/feature-contest.png",
+    image: "/images/feature-contest.webp",
   },
   {
     icon: Zap,
     title: "Live Score Updates",
     description: "Track your team's performance in real-time with live scores and automatic point calculations.",
-    image: "/images/feature-live.png",
+    image: "/images/feature-live.webp",
   },
 ];
 
@@ -49,6 +50,9 @@ const stats = [
 
 export default function Home() {
   const { isAuthenticated, loading: authLoading } = useAuth();
+  
+  // Monitor match status changes for notifications
+  useMatchNotifications();
   const { data: matchData, isLoading: matchesLoading } = trpc.cricket.getMatches.useQuery(
     undefined,
     {
@@ -66,7 +70,7 @@ export default function Home() {
           {/* Background */}
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/images/hero-bg.png')" }}
+            style={{ backgroundImage: "url('/images/hero-bg.webp')" }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
           
@@ -301,7 +305,7 @@ export default function Home() {
                 <div className="relative">
                   <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 p-8 flex items-center justify-center">
                     <img
-                      src="/logo-full.png"
+                      src="/logo-full.webp"
                       alt={COMPANY_INFO.brandName}
                       className="max-w-full max-h-full object-contain"
                     />

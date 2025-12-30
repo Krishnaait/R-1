@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import NotificationBell from "./NotificationBell";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -39,7 +40,7 @@ export default function Header() {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <img src="/logo-icon.png" alt="IMAGINITIATE" className="h-10 w-10" />
+          <img src="/logo-icon.webp" alt="IMAGINITIATE" className="h-10 w-10" />
           <span className="font-display text-xl font-bold gradient-brand-text hidden sm:inline">
             IMAGINITIATE
           </span>
@@ -74,7 +75,10 @@ export default function Header() {
         </nav>
 
         {/* Auth Buttons / User Menu */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          {/* Notification Bell */}
+          {isAuthenticated && <NotificationBell />}
+          
           {loading ? (
             <div className="h-9 w-20 bg-muted animate-pulse rounded-md" />
           ) : isAuthenticated ? (
